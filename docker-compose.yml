@@ -1,0 +1,25 @@
+version: '3.3'
+
+services:
+   chromium_40:
+      image: 'oldwebtoday/chromium:40'
+      build:
+        context: .
+        args:
+            CHROMIUM_VERSION: "40*"
+
+        labels:
+            "wr.version": "40"
+            "wr.release": "2018-02-19"
+            "wr.caps.flash": "1"
+   chromium_65:
+      image: 'oldwebtoday/chromium:65'
+      build:
+        context: .
+        args:
+            CHROMIUM_VERSION: "65*"
+
+        labels:
+            "wr.version": "65"
+            "wr.release": "2018-04-06"
+            "wr.caps.flash": "1"

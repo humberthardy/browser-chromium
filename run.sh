@@ -42,7 +42,7 @@ cat > ~/.config/chromium/Default/Preferences << EOF
 EOF
 
 
-run_browser chromium-browser --disable-web-security  --ignore-certificate-errors --start-fullscreen --no-default-browser-check --disable-popup-blocking --disable-background-networking --disable-client-side-phishing-detection --disable-component-update --safebrowsing-disable-auto-update --app="$URL" &
+run_browser chromium-browser --disable-web-security --allow-outdated-plugins  --ignore-certificate-errors --start-fullscreen --no-default-browser-check --disable-popup-blocking --disable-background-networking --disable-client-side-phishing-detection --disable-component-update --safebrowsing-disable-auto-update --app="$URL" &
 
 pid=$!
 

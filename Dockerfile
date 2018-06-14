@@ -4,14 +4,16 @@ ARG CHROMIUM_VERSION
 
 RUN sudo echo "deb http://archive.canonical.com/ubuntu xenial partner" | sudo tee /etc/apt/sources.list.d/flash-plugin.list
 RUN sudo apt-get update
-RUN sudo apt install --assume-yes adobe-flashplugin
-RUN sudo apt install --assume-yes chromium-browser=$CHROMIUM_VERSION wmctrl
+RUN sudo apt install --assume-yes adobe-flashplugin gdebi wmctrl
+
+COPY ${CHROMIUM_VERSION} /tmp/${CHROMIUM_VERSION}
+RUN  gdebi --non-interactive /tmp/${CHROMIUM_VERSION}/chromium-codecs-ffmpeg-extra_${CHROMIUM_VERSION}_amd64.deb && \
+     gdebi --non-interactive /tmp/${CHROMIUM_VERSION}/chromium-browser_${CHROMIUM_VERSION}_amd64.deb && \
+     rm -rf /tmp/${CHROMIUM_VERSION}
 
 USER browser
 
 COPY run.sh /app/run.sh
-
-RUN sudo chmod 775 /app/audio_stream.sh
 
 RUN sudo chmod a+x /app/run.sh
 

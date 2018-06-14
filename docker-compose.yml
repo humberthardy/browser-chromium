@@ -6,7 +6,7 @@ services:
       build:
         context: .
         args:
-            CHROMIUM_VERSION: "65*"
+            CHROMIUM_VERSION: "65.0.3325.181-0ubuntu0.16.04.1"
 
         labels:
             "wr.version": "65"

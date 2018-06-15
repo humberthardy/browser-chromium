@@ -18,6 +18,7 @@ touch ~/.config/chromium/First\ Run
 
 cat > ~/.config/chromium/Default/Preferences << EOF
 {
+    "translate":{"enabled":false},
     "profile": {
         "content_settings": {
             "exceptions": {

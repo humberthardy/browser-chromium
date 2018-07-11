@@ -1,6 +1,67 @@
 FROM oldwebtoday/base-browser
 
+
 ARG CHROMIUM_VERSION
+
+ARG TURBOVNC_VERSION=2.1.2
+ARG VIRTUALGL_VERSION=2.5.2
+ARG LIBJPEG_VERSION=1.5.2
+ARG WEBSOCKIFY_VERSION=0.8.0
+
+
+ARG CHROMIUM_COMMAND='chromium-browser --disable-web-security --allow-outdated-plugins  --ignore-certificate-errors --no-default-browser-check --disable-popup-blocking --disable-background-networking --disable-client-side-phishing-detection --disable-component-update --safebrowsing-disable-auto-update $$URL'
+
+# Add glvnd
+RUN dpkg --add-architecture i386 && \
+    apt-get update && apt-get install -y --no-install-recommends \
+        libxau6 libxau6:i386 \
+        libxdmcp6 libxdmcp6:i386 \
+        libxcb1 libxcb1:i386 \
+        libxext6 libxext6:i386 \
+        libx11-6 libx11-6:i386 && \
+    rm -rf /var/lib/apt/lists/*
+
+# nvidia-container-runtime
+ENV NVIDIA_VISIBLE_DEVICES \
+        ${NVIDIA_VISIBLE_DEVICES:-all}
+ENV NVIDIA_DRIVER_CAPABILITIES \
+        ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics,compat32,utility,display
+
+# Required for non-glvnd setups.
+ENV LD_LIBRARY_PATH /usr/lib/x86_64-linux-gnu:/usr/lib/i386-linux-gnu${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    	libglvnd0 libglvnd0:i386 \
+	libgl1 libgl1:i386 \
+	libglx0 libglx0:i386 \
+	libegl1 libegl1:i386 \
+	libgles2 libgles2:i386 \
+	libglu1 && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY 10_nvidia.json /usr/share/glvnd/egl_vendor.d/10_nvidia.json
+
+# Add turboVNC & virtualgl
+RUN cd /tmp && \
+    curl -fsSL -O https://svwh.dl.sourceforge.net/project/turbovnc/${TURBOVNC_VERSION}/turbovnc_${TURBOVNC_VERSION}_amd64.deb \
+        -O https://svwh.dl.sourceforge.net/project/libjpeg-turbo/${LIBJPEG_VERSION}/libjpeg-turbo-official_${LIBJPEG_VERSION}_amd64.deb \
+        -O https://svwh.dl.sourceforge.net/project/virtualgl/${VIRTUALGL_VERSION}/virtualgl_${VIRTUALGL_VERSION}_amd64.deb \
+        -O https://svwh.dl.sourceforge.net/project/virtualgl/${VIRTUALGL_VERSION}/virtualgl32_${VIRTUALGL_VERSION}_amd64.deb && \
+    dpkg -i *.deb && \
+    rm -f /tmp/*.deb && \
+    sed -i 's/$host:/unix:/g' /opt/TurboVNC/bin/vncserver && \
+    echo 'no-httpd\n\
+    no-x11-tcp-connections\n\
+    no-pam-sessions\n\
+    ' > /etc/turbovncserver-security.conf
+
+ENV PATH ${PATH}:/opt/VirtualGL/bin:/opt/TurboVNC/bin
+
+RUN \
+    curl -fsSL https://github.com/novnc/websockify/archive/v${WEBSOCKIFY_VERSION}.tar.gz | tar -xzf - -C /opt && \
+    mv /opt/websockify-${WEBSOCKIFY_VERSION} /opt/websockify && \
+    cd /opt/websockify && make
+
 
 RUN sudo echo "deb http://archive.canonical.com/ubuntu xenial partner" | sudo tee /etc/apt/sources.list.d/flash-plugin.list
 RUN sudo apt-get update
@@ -13,9 +74,12 @@ RUN  gdebi --non-interactive /tmp/${CHROMIUM_VERSION}/chromium-codecs-ffmpeg-ext
 
 USER browser
 
+ENV CHROMIUM_COMMAND $CHROMIUM_COMMAND
 COPY run.sh /app/run.sh
+COPY entry_point.sh /app/entry_point.sh
 
 RUN sudo chmod a+x /app/run.sh
+RUN sudo ln -s /usr/bin/python3 /usr/bin/python
 
 WORKDIR /home/browser
 

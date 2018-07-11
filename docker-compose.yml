@@ -7,8 +7,10 @@ services:
         context: .
         args:
             CHROMIUM_VERSION: "65.0.3325.181-0ubuntu0.16.04.1"
+            CHROMIUM_COMMAND: "chromium-browser --disable-web-security --allow-outdated-plugins  --ignore-certificate-errors --start-fullscreen --no-default-browser-check --disable-popup-blocking --disable-background-networking --disable-client-side-phishing-detection --disable-component-update --safebrowsing-disable-auto-update --app=\"$$URL\""
 
         labels:
             "wr.version": "65"
             "wr.release": "2018-04-06"
             "wr.caps.flash": "1"
+            "wr.caps.opengl-nvidia": "1"

@@ -16,7 +16,7 @@ Ubuntu 18.04 was used for this demonstration.
 2. Build the new `oldwebtoday/sphepherd` and `oldwebtoday/chromium:65` images by running `docker-compose build` from the terminal 
 3. Restart your `shepherd`'s stack  
 
-This modified version of `oldwebtoday/sphepherd` starts the browsers with:
+The modified version of `oldwebtoday/sphepherd` starts the browsers with:
    - `nvidia` runtime (equivalent to `docker run --runtime=nvidia`)
    - a bind of `/tmp/X11-unix:X0` between the host and browsers.
    

@@ -1,0 +1,6 @@
+build:
+  stage: build
+  image: docker:stable
+  when: manual
+  script:
+  - docker build . -t oldwebtoday/chromium:65

@@ -2,5 +2,8 @@ build:
   stage: build
   image: docker:stable
   when: manual
+  variables:
+    CHROMIUM_VERSION: "65.0.3325.181-0ubuntu0.16.04.1"
+    CHROMIUM_COMMAND: "chromium-browser --disable-web-security --user-data-dir=/tmp --allow-outdated-plugins  --ignore-certificate-errors --start-fullscreen --no-default-browser-check --disable-popup-blocking --disable-background-networking --disable-client-side-phishing-detection --disable-component-update --safebrowsing-disable-auto-update --app=\"$$URL\""
   script:
-  - docker build . -t oldwebtoday/chromium:65
+  - docker build --build-arg CHROMIUM_VERSION --build-arg CHROMIUM_COMMAND . -t oldwebtoday/chromium:65
